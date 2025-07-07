@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ads Links Skipper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/logo.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            {% include 'icons/logo.svg' %}
+            <h1>Ads Links Skipper</h1>
+        </div>
+        
+        <div class="domain-list">
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 1rem;">
+                {% for domain in allowed_domains %}
+                    <li>
+                        {% include 'icons/link.svg' %}
+                        {{ domain }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <form method="POST">
+        <div class="form-group">
+            <label for="url">Enter Page URL</label>
+            <input type="text" id="url" name="url" 
+                   placeholder="https://www.channelmyanmar.to/the-rule-of-jenny-pen-2024/" 
+                   value="{{ url }}" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit">
+                {% include 'icons/search.svg' %}
+                Fire
+            </button>
+            <button type="reset" id="resetBtn" class="secondary-btn">
+                {% include 'icons/reset.svg' %}
+                Reset
+            </button>
+        </div>
+    </form>
+        
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        {% if links %}
+            <div class="links-container">
+                <h3>
+                    <!-- {% include 'icons/download.svg' %}-->
+                    Found {{ links|length }} download links:
+                </h3>
+                {% if links is string %}
+                    <p class="no-links">{{ links }}</p>
+                {% else %}
+                    {% for link in links %}
+                        <div class="link-item">
+                            {% include 'icons/link.svg' %}
+                            <a href="{{ link }}" target="_blank">{{ link }}</a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>
