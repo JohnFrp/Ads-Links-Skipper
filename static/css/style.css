@@ -224,6 +224,59 @@ button svg {
     font-style: italic;
 }
 
+/* Footer Styles */
+.developer-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--light-gray);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.heart-icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--error);
+    animation: pulse 1.5s infinite;
+}
+
+.github-icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--text);
+}
+
+.developer-link {
+    color: var(--accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s ease;
+}
+
+.developer-link:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* Heartbeat animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+
 /* Responsive */
 @media (max-width: 768px) {
     .container {
@@ -241,3 +294,5 @@ button svg {
         width: 100%;
     }
 }
+
+
