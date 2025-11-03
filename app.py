@@ -25,7 +25,7 @@ def extract_filtered_download_links(url):
             'gdtot',
             'megaup.net',
             'terabox.app',
-            't.me'
+            't.me/sender_RMC_bot'
             
         ]
         
@@ -70,11 +70,12 @@ def index():
                              "yoteshinportal.cc", 
                              "gdtot", 
                              "megaup.net",
-                             "terabox.app",
-                             "t.me"
+                             "terabox.app"
+                             
                              
                          ])
 
 if __name__ == '__main__':
 
     app.run(debug=True)
+
