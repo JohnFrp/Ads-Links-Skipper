@@ -1,81 +1,71 @@
-from flask import Flask, render_template, request
-import cloudscraper
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+"""
+app.py
 
+This is the main web application file (the "Controller").
+Its only responsibilities are:
+1. Handling web routes (e.g., '/').
+2. Getting user input from the form.
+3. Calling the `ScraperService` to do the "real work".
+4. Passing the results (or errors) to the `index.html` template.
+
+This file is now very "thin" and easy to read.
+It adheres to SRP and DIP (it depends on the ScraperService,
+not on the low-level scraping libraries).
+"""
+from flask import Flask, request, render_template
+
+# Import our separated modules
+from config import ALLOWED_DOMAINS, BASE_HEADERS
+from scraper_service import ScraperService
+
+# Initialize the Flask app
 app = Flask(__name__)
 
-def extract_filtered_download_links(url):
-    try:
-        scraper = cloudscraper.create_scraper()
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-            'Referer': 'https://www.google.com/'
-        }
-        
-        response = scraper.get(url, headers=headers)
-        response.raise_for_status()
-        
-        soup = BeautifulSoup(response.text, 'html.parser')
-        base_url = f"{url.split('/')[0]}//{url.split('/')[2]}"
-        
-        allowed_domains = [
-            'usersdrive.com',
-            'yoteshinportal.cc',
-            'gdtot',
-            'megaup.net',
-            'terabox.app',
-            't.me/sender_RMC_bot'
-            
-        ]
-        
-        download_links = set()
-        all_links = soup.find_all('a', href=True)
-        
-        for a in all_links:
-            href = a['href']
-            if not href.startswith('http'):
-                href = urljoin(base_url, href)
-            
-            if any(domain in href.lower() for domain in allowed_domains):
-                download_links.add(href)
-        
-        return sorted(download_links) if download_links else "No matching download links found"
-    
-    except Exception as e:
-        return f"Error extracting links: {str(e)}"
+# --- Dependency Injection ---
+# We create ONE instance of our service and inject its dependencies.
+# The web app doesn't know HOW the scraper works, only that it
+# has an .extract_links() method.
+scraper = ScraperService(
+    allowed_domains=ALLOWED_DOMAINS,
+    headers=BASE_HEADERS
+)
+# -----------------------------
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """
+    Main route for the application.
+    Handles both displaying the form (GET) and processing it (POST).
+    """
     links = None
-    url = ""
     error = None
+    url = ""
     
     if request.method == 'POST':
         url = request.form.get('url', '').strip()
-        if url:
+        if not url:
+            error = "Please enter a URL."
+        else:
             if not url.startswith(('http://', 'https://')):
                 url = 'https://' + url
-            links = extract_filtered_download_links(url)
-            if links and isinstance(links, str) and links.startswith("Error"):
-                error = links
-                links = None
-    
-    return render_template('index.html', 
-                         links=links, 
-                         url=url, 
-                         error=error,
-                         allowed_domains=[
-                             "usersdrive.com", 
-                             "yoteshinportal.cc", 
-                             "gdtot", 
-                             "megaup.net",
-                             "terabox.app"
-                             
-                             
-                         ])
+            
+            # --- Call the Service ---
+            # All the complex logic is hidden inside the service.
+            # We just call one method and get a clean result.
+            links, error = scraper.extract_links(url)
+            # ------------------------
+
+    # Pass all data to the Jinja2 template for rendering
+    return render_template(
+        'index.html', 
+        links=links, 
+        error=error, 
+        url=url, 
+        allowed_domains=ALLOWED_DOMAINS
+    )
 
 if __name__ == '__main__':
-
-    app.run(debug=True)
+    # Setting debug=False is safer for production
+    # host='0.0.0.0' makes it accessible on your network
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
