@@ -23,7 +23,9 @@ def extract_filtered_download_links(url):
             'usersdrive.com',
             'yoteshinportal.cc',
             'gdtot',
-            'megaup.net'
+            'megaup.net',
+            'terabox.app',
+            't.me'
             
         ]
         
@@ -67,9 +69,12 @@ def index():
                              "usersdrive.com", 
                              "yoteshinportal.cc", 
                              "gdtot", 
-                             "megaup.net" 
+                             "megaup.net",
+                             "terabox.app",
+                             "t.me"
                              
                          ])
 
 if __name__ == '__main__':
+
     app.run(debug=True)
